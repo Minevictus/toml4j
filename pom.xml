@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.moandjiezana.toml</groupId>
   <artifactId>toml4j</artifactId>
-  <version>0.7.3-SNAPSHOT</version>
+  <version>0.7.3</version>
   <name>toml4j</name>
   <description>A parser for TOML</description>
   <url>http://moandjiezana.com/toml/toml4j</url>
@@ -29,9 +29,13 @@
   </ciManagement>
   <distributionManagement>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>proxi-nexus</id>
+      <url>https://nexus.proximyst.com/repository/maven-any</url>
     </snapshotRepository>
+    <repository>
+      <id>proxi-nexus</id>
+      <url>https://nexus.proximyst.com/repository/maven-any</url>
+    </repository>
   </distributionManagement>
   <developers>
     <developer>

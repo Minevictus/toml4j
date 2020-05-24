@@ -26,7 +26,7 @@ import com.google.gson.JsonElement;
  * <p>All getters can fall back to default values if they have been provided as a constructor argument.
  * Getters for simple values (String, Date, etc.) will return null if no matching key exists.
  * {@link #getList(String)}, {@link #getTable(String)} and {@link #getTables(String)} return empty values if there is no matching key.</p>
- * 
+ *
  * <p>All read methods throw an {@link IllegalStateException} if the TOML is incorrect.</p>
  *
  * <p>Example usage:</p>
@@ -40,7 +40,7 @@ import com.google.gson.JsonElement;
  *
  */
 public class Toml {
-  
+
   private static final Gson DEFAULT_GSON = new Gson();
 
   private Map<String, Object> values = new HashMap<String, Object>();
@@ -118,12 +118,12 @@ public class Toml {
   /**
    * Populates the current Toml instance with values from otherToml.
    *
-   * @param otherToml 
+   * @param otherToml
    * @return this instance
    */
   public Toml read(Toml otherToml) {
     this.values = otherToml.values;
-    
+
     return this;
   }
 
@@ -171,7 +171,7 @@ public class Toml {
   public <T> List<T> getList(String key) {
     @SuppressWarnings("unchecked")
     List<T> list = (List<T>) get(key);
-    
+
     return list;
   }
 
@@ -183,7 +183,7 @@ public class Toml {
    */
   public <T> List<T> getList(String key, List<T> defaultValue) {
     List<T> list = getList(key);
-    
+
     return list != null ? list : defaultValue;
   }
 
@@ -221,7 +221,7 @@ public class Toml {
   @SuppressWarnings("unchecked")
   public Toml getTable(String key) {
     Map<String, Object> map = (Map<String, Object>) get(key);
-    
+
     return map != null ? new Toml(null, map) : null;
   }
 
@@ -260,7 +260,7 @@ public class Toml {
    */
   public boolean containsPrimitive(String key) {
     Object object = get(key);
-    
+
     return object != null && !(object instanceof Map) && !(object instanceof List);
   }
 
@@ -270,7 +270,7 @@ public class Toml {
    */
   public boolean containsTable(String key) {
     Object object = get(key);
-    
+
     return object != null && (object instanceof Map);
   }
 
@@ -280,7 +280,7 @@ public class Toml {
    */
   public boolean containsTableArray(String key) {
     Object object = get(key);
-    
+
     return object != null && (object instanceof List);
   }
 
@@ -315,17 +315,17 @@ public class Toml {
    */
   public <T> T to(Class<T> targetClass) {
     JsonElement json = DEFAULT_GSON.toJsonTree(toMap());
-    
+
     if (targetClass == JsonElement.class) {
       return targetClass.cast(json);
     }
-    
+
     return DEFAULT_GSON.fromJson(json, targetClass);
   }
 
   public Map<String, Object> toMap() {
     HashMap<String, Object> valuesCopy = new HashMap<String, Object>(values);
-    
+
     if (defaults != null) {
       for (Map.Entry<String, Object> entry : defaults.values.entrySet()) {
         if (!valuesCopy.containsKey(entry.getKey())) {
@@ -336,16 +336,27 @@ public class Toml {
 
     return valuesCopy;
   }
-  
+
+  /**
+   * Set the key to the value in the map of this {@link Toml} instance.
+   *
+   * @param key The key to (re-)populate.
+   * @param value The value to associate with the key.
+   * @since 0.7.3
+   */
+  public void set(String key, Object value) {
+    this.values.put(key, value);
+  }
+
   /**
    * @return a {@link Set} of Map.Entry instances. Modifications to the {@link Set} are not reflected in this Toml instance. Entries are immutable, so {@link Map.Entry#setValue(Object)} throws an UnsupportedOperationException.
    */
   public Set<Map.Entry<String,Object>> entrySet() {
     Set<Map.Entry<String, Object>> entries = new LinkedHashSet<Map.Entry<String, Object>>();
-    
+
     for (Map.Entry<String, Object> entry : values.entrySet()) {
       Class<? extends Object> entryClass = entry.getValue().getClass();
-      
+
       if (Map.class.isAssignableFrom(entryClass)) {
         entries.add(new Toml.Entry(entry.getKey(), getTable(entry.getKey())));
       } else if (List.class.isAssignableFrom(entryClass)) {
@@ -359,12 +370,12 @@ public class Toml {
         entries.add(new Toml.Entry(entry.getKey(), entry.getValue()));
       }
     }
-    
+
     return entries;
   }
 
   private class Entry implements Map.Entry<String, Object> {
-    
+
     private final String key;
     private final Object value;
 
@@ -382,7 +393,7 @@ public class Toml {
     public Object setValue(Object value) {
       throw new UnsupportedOperationException("TOML entry values cannot be changed.");
     }
-    
+
     private Entry(String key, Object value) {
       this.key = key;
       this.value = value;
@@ -396,9 +407,9 @@ public class Toml {
     }
 
     Object current = new HashMap<String, Object>(values);
-    
+
     Keys.Key[] keys = Keys.split(key);
-    
+
     for (Keys.Key k : keys) {
       if (k.index == -1 && current instanceof Map && ((Map<String, Object>) current).containsKey(k.path)) {
         return ((Map<String, Object>) current).get(k.path);
@@ -410,7 +421,7 @@ public class Toml {
         if (k.index >= ((List<?>) current).size()) {
           return null;
         }
-        
+
         current = ((List<?>) current).get(k.index);
       }
 
@@ -418,10 +429,10 @@ public class Toml {
         return defaults != null ? defaults.get(key) : null;
       }
     }
-    
+
     return current;
   }
-  
+
   private Toml(Toml defaults, Map<String, Object> values) {
     this.values = values;
     this.defaults = defaults;
