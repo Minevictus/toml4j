@@ -1,5 +1,7 @@
 package com.moandjiezana.toml;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +43,9 @@ import com.google.gson.JsonElement;
  */
 public class Toml {
 
-  private static final Gson DEFAULT_GSON = new Gson();
+  public static final Gson DEFAULT_GSON = new GsonBuilder()
+      .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+      .create();
 
   private Map<String, Object> values = new HashMap<String, Object>();
   private final Toml defaults;
